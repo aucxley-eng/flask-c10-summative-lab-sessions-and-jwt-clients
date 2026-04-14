@@ -15,8 +15,8 @@ def create_app(config_class=Config):
     
     from app.api import auth_bp, notes_bp
     
-    app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    app.register_blueprint(notes_bp, url_prefix='/api/notes')
+    app.register_blueprint(auth_bp, url_prefix='/')
+    app.register_blueprint(notes_bp, url_prefix='/notes')
     
     @app.errorhandler(400)
     def bad_request(e):

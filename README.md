@@ -1,6 +1,6 @@
 # Flask Notes API
 
-A secure Flask REST API with API key-based authentication for a notes productivity application.
+A secure Flask REST API with session-based authentication for a notes productivity application.
 
 ## Description
 
@@ -17,31 +17,29 @@ The project follows a layered architecture:
 
 ## Auth Method
 
-API Key-based authentication (not JWT or sessions).
+Session-based authentication (Flask sessions).
 
 ## Installation
 
 1. Install dependencies:
 ```bash
-pipenv install
+pip install -r requirements.txt
 ```
 
-2. Initialize the database:
+2. Run the application:
 ```bash
-pipenv run flask db init
-pipenv run flask db migrate
-pipenv run flask db upgrade
+python run.py
 ```
 
-3. Seed the database with sample data:
+3. Seed the database (optional):
 ```bash
-pipenv run python seed.py
+python seed.py
 ```
 
 ## Run Instructions
 
 ```bash
-pipenv run python app.py
+python run.py
 ```
 
 The server will run on `http://localhost:5555`
@@ -52,65 +50,71 @@ The server will run on `http://localhost:5555`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/auth/register` | Register a new user |
-| POST | `/api/auth/login` | Login with email and password |
-| GET | `/api/auth/me` | Get current authenticated user |
-| POST | `/api/auth/refresh-key` | Generate new API key |
+| POST | `/signup` | Register a new user |
+| POST | `/login` | Login with username and password |
+| GET | `/check_session` | Check if user is logged in |
+| DELETE | `/logout` | Logout current user |
 
 ### Notes (Protected Routes)
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/notes` | Get all notes (paginated) |
-| POST | `/api/notes` | Create a new note |
-| GET | `/api/notes/<id>` | Get a specific note |
-| PATCH | `/api/notes/<id>` | Update a note |
-| DELETE | `/api/notes/<id>` | Delete a note |
+| GET | `/notes` | Get all notes (paginated) |
+| POST | `/notes` | Create a new note |
+| GET | `/notes/<id>` | Get a specific note |
+| PATCH | `/notes/<id>` | Update a note |
+| DELETE | `/notes/<id>` | Delete a note |
 
 ## Authentication Flow
 
+The frontend expects session-based authentication:
+
 ### Register
 ```
-POST /api/auth/register
+POST /signup
 Body: {
     'username': 'string',
-    'email': 'string',
-    'password': 'string'
+    'password': 'string',
+    'password_confirmation': 'string'
 }
 Response: {
-    'user': {...},
-    'api_key': 'string'
+    'user': {'id': 1, 'username': 'string'}
 }
 ```
 
 ### Login
 ```
-POST /api/auth/login
+POST /login
 Body: {
-    'email': 'string',
+    'username': 'string',
     'password': 'string'
 }
 Response: {
-    'api_key': 'string',
-    'user': {...}
+    'user': {'id': 1, 'username': 'string'}
 }
 ```
 
-### Using the API Key
-For all protected endpoints, include the API key in the header:
-- **Header Key**: `X-API-Key`
-- **Header Value**: Your API key
+### Check Session
+```
+GET /check_session
+Response (logged in): {'id': 1, 'username': 'string'}
+Response (not logged in): {}
+```
+
+### Logout
+```
+DELETE /logout
+Response: {}
+```
 
 ### Get Notes (with pagination)
 ```
-GET /api/notes?page=1&per_page=10
-Headers: X-API-Key: <your_api_key>
+GET /notes?page=1&per_page=10
 ```
 
 ### Create Note
 ```
-POST /api/notes
-Headers: X-API-Key: <your_api_key>
+POST /notes
 Body: {
     'title': 'string',
     'content': 'string'

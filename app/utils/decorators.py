@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import request, jsonify
+from flask import request, jsonify, session
 from app.models import User
 
 
@@ -7,20 +7,20 @@ def require_auth(fn=None):
     def decorator(fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
-            api_key = request.headers.get('X-API-Key')
+            user_id = session.get('user_id')
             
-            if not api_key:
+            if not user_id:
                 return jsonify({
                     'error': 'Unauthorized',
-                    'message': 'API key required. Include X-API-Key header.'
+                    'message': 'Authentication required'
                 }), 401
             
-            user = User.query.filter_by(api_key=api_key).first()
+            user = User.query.get(user_id)
             
             if not user:
                 return jsonify({
                     'error': 'Unauthorized',
-                    'message': 'Invalid API key.'
+                    'message': 'Invalid session'
                 }), 401
             
             request.current_user = user

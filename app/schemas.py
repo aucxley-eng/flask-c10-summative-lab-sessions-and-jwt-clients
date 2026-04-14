@@ -9,7 +9,7 @@ def must_not_be_blank(data):
 class UserSchema(Schema):
     id = fields.Int(dump_only=True)
     username = fields.Str(required=True, validate=must_not_be_blank)
-    email = fields.Email(required=True)
+    email = fields.Email()
 
 
 class NoteSchema(Schema):

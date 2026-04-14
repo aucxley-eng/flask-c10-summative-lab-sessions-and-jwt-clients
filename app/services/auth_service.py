@@ -6,13 +6,9 @@ class AuthService:
     def __init__(self):
         self.user_repo = UserRepository()
     
-    def validate_email(self, email):
-        pattern = r'^[\\w\\.-]+@[\\w\\.-]+\\.\\w+$'
-        return re.match(pattern, email)
-    
     def validate_registration_data(self, data):
         errors = []
-        required_fields = ['username', 'email', 'password']
+        required_fields = ['username', 'password']
         
         for field in required_fields:
             if not data.get(field):
@@ -20,9 +16,6 @@ class AuthService:
         
         if errors:
             return False, f'Missing required fields: {errors}'
-        
-        if not self.validate_email(data.get('email', '')):
-            return False, 'Invalid email format'
         
         if len(data.get('password', '')) < 6:
             return False, 'Password must be at least 6 characters'
@@ -37,38 +30,28 @@ class AuthService:
         if self.user_repo.find_by_username(data['username']):
             return None, f'Username {data['username']} already exists'
         
-        if self.user_repo.find_by_email(data['email']):
-            return None, f'Email {data['email']} already registered'
-        
         try:
-            user = self.user_repo.create_with_api_key(
+            user = self.user_repo.create_user(
                 username=data['username'],
-                email=data['email'],
                 password=data['password']
             )
             return user, None
         except Exception as e:
             return None, 'Error creating user'
     
-    def login(self, email, password):
-        if not email or not password:
-            return None, 'Email and password required'
+    def login(self, username, password):
+        if not username or not password:
+            return None, 'Username and password required'
         
-        user = self.user_repo.find_by_email(email)
+        user = self.user_repo.find_by_username(username)
         
         if not user:
-            return None, 'Invalid email or password'
+            return None, 'Invalid username or password'
         
         if not user.check_password(password):
-            return None, 'Invalid email or password'
-        
-        if not user.api_key:
-            user = self.user_repo.generate_new_api_key(user)
+            return None, 'Invalid username or password'
         
         return user, None
     
-    def get_user_by_api_key(self, api_key):
-        return self.user_repo.find_by_api_key(api_key)
-    
-    def refresh_api_key(self, user):
-        return self.user_repo.generate_new_api_key(user)
+    def get_user_by_id(self, user_id):
+        return self.user_repo.get_by_id(user_id)
