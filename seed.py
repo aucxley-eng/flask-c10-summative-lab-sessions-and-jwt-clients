@@ -1,8 +1,9 @@
 from faker import Faker
-from app import create_app, db
-from app.models import User, Note
+from app import create_app
+from app.models import db, User, Note, generate_api_key
 
 fake = Faker()
+
 
 def seed():
     app = create_app()
@@ -16,8 +17,12 @@ def seed():
         
         users = []
         for i in range(3):
-            user = User(username=fake.user_name() + str(i))
+            user = User(
+                username=fake.user_name() + str(i),
+                email=fake.email()
+            )
             user.set_password('password123')
+            user.api_key = generate_api_key()
             db.session.add(user)
         
         db.session.commit()
@@ -34,8 +39,9 @@ def seed():
         
         db.session.commit()
         
-        print("Database seeded successfully!")
-        print(f"Created {len(users)} users and {Note.query.count()} notes")
+        print('Database seeded successfully!')
+        print(f'Created {len(users)} users with API keys')
+        print(f'Created {Note.query.count()} notes')
 
 
 if __name__ == '__main__':
