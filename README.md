@@ -1,10 +1,10 @@
 # Flask Notes API
 
-A secure Flask REST API with session-based authentication for a notes productivity application.
+A secure Flask REST API with dual authentication support (Sessions and JWT) for a notes productivity application.
 
 ## Description
 
-This backend provides user authentication and CRUD operations for personal notes. Users can register, login, and manage their own notes. Each user can only access their own notes.
+This backend provides user authentication and CRUD operations for personal notes. It is designed to work seamlessly with both the `client-with-sessions` and `client-with-jwt` React frontends. Users can register, login, and manage their own notes securely.
 
 ## Architecture
 
@@ -13,11 +13,13 @@ The project follows a layered architecture:
 - **Services**: Business logic (AuthService, NoteService)
 - **API Routes**: Request handlers (auth, notes)
 - **Responses**: Standardized API responses
-- **Utils**: Custom decorators for authentication
+- **Utils**: Custom decorators for authentication (supports both Sessions and JWT)
 
 ## Auth Method
 
-Session-based authentication (Flask sessions).
+The API supports two authentication methods simultaneously:
+1. **Session-based authentication**: Uses Flask sessions (cookies).
+2. **JWT-based authentication**: Uses Bearer tokens in the `Authorization` header.
 
 ## Installation
 
@@ -31,7 +33,7 @@ pip install -r requirements.txt
 python run.py
 ```
 
-3. Seed the database (optional):
+3. Seed the database:
 ```bash
 python seed.py
 ```
@@ -48,75 +50,38 @@ The server will run on `http://localhost:5555`
 
 ### Authentication
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/signup` | Register a new user |
-| POST | `/login` | Login with username and password |
-| GET | `/check_session` | Check if user is logged in |
-| DELETE | `/logout` | Logout current user |
+| Method | Endpoint | Description | Auth Type |
+|--------|----------|-------------|-----------|
+| POST | `/signup` | Register a new user | Public |
+| POST | `/login` | Login with username and password | Public |
+| GET | `/check_session` | Check if user is logged in (Sessions) | Session |
+| GET | `/me` | Get current user (JWT) | JWT |
+| DELETE | `/logout` | Logout current user | Session |
 
 ### Notes (Protected Routes)
 
+All notes endpoints require either a valid session or a valid JWT Bearer token.
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/notes` | Get all notes (paginated) |
+| GET | `/notes` | Get all notes for the current user (paginated) |
 | POST | `/notes` | Create a new note |
-| GET | `/notes/<id>` | Get a specific note |
-| PATCH | `/notes/<id>` | Update a note |
-| DELETE | `/notes/<id>` | Delete a note |
+| GET | `/notes/<id>` | Get a specific note owned by the user |
+| PATCH | `/notes/<id>` | Update a note owned by the user |
+| DELETE | `/notes/<id>` | Delete a note owned by the user |
 
-## Authentication Flow
+## Pagination
 
-The frontend expects session-based authentication:
+The `GET /notes` endpoint supports pagination via query parameters:
+- `page`: The page number (default: 1)
+- `per_page`: Number of items per page (default: 10)
 
-### Register
-```
-POST /signup
-Body: {
-    'username': 'string',
-    'password': 'string',
-    'password_confirmation': 'string'
-}
-Response: {
-    'user': {'id': 1, 'username': 'string'}
-}
-```
+Example: `GET /notes?page=1&per_page=5`
 
-### Login
-```
-POST /login
-Body: {
-    'username': 'string',
-    'password': 'string'
-}
-Response: {
-    'user': {'id': 1, 'username': 'string'}
-}
-```
+## Database Seeding
 
-### Check Session
+To populate the database with sample data, run:
+```bash
+python seed.py
 ```
-GET /check_session
-Response (logged in): {'id': 1, 'username': 'string'}
-Response (not logged in): {}
-```
-
-### Logout
-```
-DELETE /logout
-Response: {}
-```
-
-### Get Notes (with pagination)
-```
-GET /notes?page=1&per_page=10
-```
-
-### Create Note
-```
-POST /notes
-Body: {
-    'title': 'string',
-    'content': 'string'
-}
-```
+This will create 3 sample users and 5 notes for each user.
