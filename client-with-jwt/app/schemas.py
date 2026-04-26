@@ -16,6 +16,8 @@ class NoteSchema(Schema):
     id = fields.Int(dump_only=True)
     title = fields.Str(required=True, validate=must_not_be_blank)
     content = fields.Str(required=True, validate=must_not_be_blank)
+    category = fields.Str()
+    is_pinned = fields.Bool()
     user_id = fields.Int(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)

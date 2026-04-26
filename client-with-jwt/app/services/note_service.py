@@ -21,13 +21,15 @@ class NoteService:
             return None, 'Note not found'
         return note, None
     
-    def create_note(self, user_id, title, content):
+    def create_note(self, user_id, title, content, category='General', is_pinned=False):
         if not title or not content:
             return None, 'Title and content are required'
         
         note = self.note_repo.create(
             title=title,
             content=content,
+            category=category,
+            is_pinned=is_pinned,
             user_id=user_id
         )
         return note, None
@@ -41,6 +43,10 @@ class NoteService:
             note.title = data['title']
         if 'content' in data:
             note.content = data['content']
+        if 'category' in data:
+            note.category = data['category']
+        if 'is_pinned' in data:
+            note.is_pinned = data['is_pinned']
         
         note = self.note_repo.save(note)
         return note, None

@@ -28,7 +28,13 @@ def create_note():
     user = request.current_user
     
     note_service = NoteService()
-    note, error = note_service.create_note(user.id, data.get('title'), data.get('content'))
+    note, error = note_service.create_note(
+        user.id, 
+        data.get('title'), 
+        data.get('content'),
+        category=data.get('category', 'General'),
+        is_pinned=data.get('is_pinned', False)
+    )
     
     if error:
         return APIResponse.error(error, 'Validation Error', 400)

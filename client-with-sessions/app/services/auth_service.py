@@ -8,7 +8,7 @@ class AuthService:
     
     def validate_registration_data(self, data):
         errors = []
-        required_fields = ['username', 'password']
+        required_fields = ['username', 'password', 'email']
         
         for field in required_fields:
             if not data.get(field):
@@ -20,6 +20,9 @@ class AuthService:
         if len(data.get('password', '')) < 6:
             return False, 'Password must be at least 6 characters'
         
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", data.get('email', '')):
+            return False, 'Invalid email format'
+        
         return True, None
     
     def register(self, data):
@@ -28,12 +31,13 @@ class AuthService:
             return None, error
         
         if self.user_repo.find_by_username(data['username']):
-            return None, f'Username {data['username']} already exists'
+            return None, f"Username {data['username']} already exists"
         
         try:
             user = self.user_repo.create_user(
                 username=data['username'],
-                password=data['password']
+                password=data['password'],
+                email=data.get('email')
             )
             return user, None
         except Exception as e:
