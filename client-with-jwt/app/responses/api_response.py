@@ -1,4 +1,5 @@
-from flask import jsonify
+import json
+from flask import Flask, Response
 
 
 class APIResponse:
@@ -9,12 +10,14 @@ class APIResponse:
             response['message'] = message
         if data:
             response.update(data)
-        return jsonify(response), status_code
+        json_str = json.dumps(response, indent=2)
+        return Response(json_str, status_code, mimetype='application/json')
     
     @staticmethod
     def error(message, error_code=None, status_code=400):
         response = {'error': error_code or 'Error', 'message': message}
-        return jsonify(response), status_code
+        json_str = json.dumps(response, indent=2)
+        return Response(json_str, status_code, mimetype='application/json')
     
     @staticmethod
     def validation_error(missing_fields):
