@@ -8,7 +8,7 @@ class AuthService:
     
     def validate_registration_data(self, data):
         errors = []
-        required_fields = ['username', 'password', 'email']
+        required_fields = ['username', 'password']
         
         for field in required_fields:
             if not data.get(field):
@@ -20,7 +20,7 @@ class AuthService:
         if len(data.get('password', '')) < 6:
             return False, 'Password must be at least 6 characters'
         
-        if not re.match(r"[^@]+@[^@]+\.[^@]+", data.get('email', '')):
+        if data.get('email') and not re.match(r"[^@]+@[^@]+\.[^@]+", data.get('email', '')):
             return False, 'Invalid email format'
         
         return True, None
