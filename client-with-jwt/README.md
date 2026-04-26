@@ -11,29 +11,42 @@ This is a standalone backend implementation for the Notes productivity app. It u
 - **Auth**: JWT (Bearer Tokens)
 - **Resource**: User-owned notes with pagination
 
-## Setup Instructions (Python 3.14)
-1. Navigate to this folder:
+## Installation (Python 3.14)
+1. Install dependencies:
    ```bash
    cd client-with-jwt
+   source .venv/bin/activate
+   pipenv install --skip-lock
    ```
-2. Activate the virtual environment:
+   OR use the existing venv:
    ```bash
    source .venv/bin/activate
    ```
-3. Run the API:
+
+2. Seed the database (optional):
    ```bash
-   python3 run.py
+   python seed.py
    ```
-   The server will run on `http://localhost:5555`.
+
+## Run Instructions
+```bash
+python run.py
+```
+The server will run on `http://localhost:5555`.
 
 ## API Endpoints
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/signup` | Register a new user (returns JWT) |
-| POST | `/login` | Login (returns JWT) |
-| GET | `/me` | Get current user via JWT |
-| GET | `/notes` | Get own notes (paginated) |
-| POST | `/notes` | Create a new note |
-| GET | `/notes/<id>` | View specific note |
-| PATCH | `/notes/<id>` | Update specific note |
-| DELETE | `/notes/<id>` | Delete specific note |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/signup` | No | Register a new user (returns JWT) |
+| POST | `/login` | No | Login (returns JWT) |
+| GET | `/me` | JWT | Get current user |
+| GET | `/notes` | JWT | Get own notes (paginated) |
+| POST | `/notes` | JWT | Create a new note |
+| GET | `/notes/<id>` | JWT | View specific note |
+| PATCH | `/notes/<id>` | JWT | Update specific note |
+| DELETE | `/notes/<id>` | JWT | Delete specific note |
+
+Pagination: `/notes?page=1&per_page=10`
+
+## Test Users (after seeding)
+- Password for all test users: `password123`

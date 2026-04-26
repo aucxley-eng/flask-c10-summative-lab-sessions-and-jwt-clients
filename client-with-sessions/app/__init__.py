@@ -1,11 +1,8 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_jwt_extended import JWTManager
 from config import Config
 from app.models import db, bcrypt
-
-jwt = JWTManager()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -13,7 +10,6 @@ def create_app(config_class=Config):
     
     db.init_app(app)
     bcrypt.init_app(app)
-    jwt.init_app(app)
     migrate = Migrate(app, db)
     
     from app.api import auth_bp, notes_bp
