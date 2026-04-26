@@ -250,14 +250,3 @@ After running `seed.py`:
 
 ---
 
-## Meeting Lab Requirements
-
-✅ User authentication (JWT or Sessions)
-✅ User-owned resource (Notes)
-✅ Full CRUD operations
-✅ Pagination on resource index
-✅ Route protection
-✅ Users cannot access other users' data
-✅ Secure password handling (Bcrypt)
-✅ Database seeding
-✅ README documentation
